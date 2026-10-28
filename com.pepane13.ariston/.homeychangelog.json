@@ -10,5 +10,9 @@
   "2.0.0": {
     "en": "Automatic strategy removed: the app is a plain driver for the water heater, driven by your Flows. Simpler settings, no notification of its own.",
     "fr": "Stratégie automatique retirée : l'app est un simple pilote du cumulus, commandé par vos Flows. Réglages simplifiés, aucune notification de sa part."
+  },
+  "2.0.1": {
+    "en": "Fix: devices paired with 1.0.x showed no values and crashed the mobile app; the obsolete strategy capabilities are now removed properly.",
+    "fr": "Correctif : les appareils ajoutés en 1.0.x n'affichaient plus aucune valeur et faisaient planter l'app mobile ; les anciennes capacités de la stratégie sont maintenant bien retirées."
   }
 }

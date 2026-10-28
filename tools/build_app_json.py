@@ -4,7 +4,7 @@ import json
 import os
 
 ROOT = os.path.join(os.path.dirname(__file__), '..', 'com.pepane13.ariston')
-VERSION = '2.0.0'
+VERSION = '2.0.1'
 
 
 def t(en, fr):
@@ -59,6 +59,21 @@ CAPABILITIES = {
     'ariston_energy': {
         'type': 'number', 'title': t('Energy, last day', 'Énergie, dernier jour'), 'units': t('kWh', 'kWh'), 'decimals': 2,
         'getable': True, 'setable': False, 'uiComponent': 'sensor', 'insights': True, 'icon': '/assets/capabilities/energy.svg',
+    },
+    # Capabilities of the 1.0.x automatic strategy. No driver uses them any more, but Homey can only remove
+    # a capability from an existing device while its definition is still in the app: keep them defined so
+    # device.js can drop them from devices paired with 1.0.x.
+    'ariston_automation': {
+        'type': 'boolean', 'title': t('Automatic strategy', 'Stratégie automatique'), 'getable': True, 'setable': True,
+        'uiComponent': 'toggle', 'icon': '/assets/capabilities/auto.svg',
+    },
+    'ariston_rule': {
+        'type': 'string', 'title': t('Active rule', 'Règle active'), 'getable': True, 'setable': False,
+        'uiComponent': 'sensor', 'icon': '/assets/capabilities/auto.svg',
+    },
+    'ariston_legionella': {
+        'type': 'string', 'title': t('Last anti-legionella', 'Dernière anti-légionellose'), 'getable': True, 'setable': False,
+        'uiComponent': 'sensor', 'icon': '/assets/capabilities/legionella.svg',
     },
 }
 

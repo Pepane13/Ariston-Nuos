@@ -1,6 +1,6 @@
 {
   "id": "com.pepane13.ariston",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "compatibility": ">=12.2.0",
   "sdk": 3,
   "platforms": [
@@ -128,6 +128,39 @@
       "uiComponent": "sensor",
       "insights": true,
       "icon": "/assets/capabilities/energy.svg"
+    },
+    "ariston_automation": {
+      "type": "boolean",
+      "title": {
+        "en": "Automatic strategy",
+        "fr": "Stratégie automatique"
+      },
+      "getable": true,
+      "setable": true,
+      "uiComponent": "toggle",
+      "icon": "/assets/capabilities/auto.svg"
+    },
+    "ariston_rule": {
+      "type": "string",
+      "title": {
+        "en": "Active rule",
+        "fr": "Règle active"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "icon": "/assets/capabilities/auto.svg"
+    },
+    "ariston_legionella": {
+      "type": "string",
+      "title": {
+        "en": "Last anti-legionella",
+        "fr": "Dernière anti-légionellose"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "icon": "/assets/capabilities/legionella.svg"
     }
   },
   "drivers": [
