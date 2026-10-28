@@ -1,0 +1,40 @@
+{
+  "errors": {
+    "login": "Connexion refusée : vérifiez l'e-mail et le mot de passe de votre compte Ariston NET.",
+    "login_repair": "Connexion Ariston refusée : utilisez Réparer pour saisir à nouveau le mot de passe.",
+    "cloud": "Cloud Ariston injoignable :"
+  },
+  "modes": {
+    "green": "Green",
+    "comfort": "Comfort",
+    "fast": "Fast",
+    "imemory": "i-Memory"
+  },
+  "rules": {
+    "base": "Base",
+    "solar": "Production solaire",
+    "battery": "Batterie pleine",
+    "night": "Appoint de nuit",
+    "red_eve": "Préchauffe veille de jour rouge",
+    "red_peak": "Tempo rouge, heures pleines",
+    "legionella": "Anti-légionellose",
+    "manual": "Manuel",
+    "paused": "Stratégie suspendue"
+  },
+  "legio": {
+    "running": "Cycle en cours",
+    "why_solar": "production solaire",
+    "why_night": "nuit en heures creuses",
+    "why_manual": "lancement manuel"
+  },
+  "notify": {
+    "legio_started": "cycle anti-légionellose démarré ({{why}}), eau à {{temp}} °C",
+    "legio_done": "cycle anti-légionellose terminé, eau à {{temp}} °C",
+    "legio_timeout": "cycle anti-légionellose arrêté après 8 h sans atteindre la température (eau à {{temp}} °C), relancé à la prochaine occasion",
+    "legio_paused": "cycle anti-légionellose suspendu pendant les heures pleines rouges (eau à {{temp}} °C)",
+    "boost_timer": "boost arrêté après la durée maximale, retour à la stratégie (eau à {{temp}} °C)",
+    "boost_red_peak": "boost refusé en heures pleines Tempo rouge (eau à {{temp}} °C)",
+    "boost_reason_timer": "durée maximale",
+    "boost_reason_red_peak": "heures pleines Tempo rouge"
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "errors": {
+    "login": "Sign-in failed: check the e-mail and password of your Ariston NET account.",
+    "login_repair": "Ariston sign-in failed: use Repair to enter the password again.",
+    "cloud": "Ariston cloud unreachable:"
+  },
+  "modes": {
+    "green": "Green",
+    "comfort": "Comfort",
+    "fast": "Fast",
+    "imemory": "i-Memory"
+  },
+  "rules": {
+    "base": "Base",
+    "solar": "Solar production",
+    "battery": "Full battery",
+    "night": "Night top-up",
+    "red_eve": "Preheat before red day",
+    "red_peak": "Tempo red, peak hours",
+    "legionella": "Anti-legionella",
+    "manual": "Manual",
+    "paused": "Strategy paused"
+  },
+  "legio": {
+    "running": "Cycle in progress",
+    "why_solar": "solar production",
+    "why_night": "off-peak night",
+    "why_manual": "manual start"
+  },
+  "notify": {
+    "legio_started": "anti-legionella cycle started ({{why}}), water at {{temp}} °C",
+    "legio_done": "anti-legionella cycle done, water at {{temp}} °C",
+    "legio_timeout": "anti-legionella cycle stopped after 8 h without reaching the temperature (water at {{temp}} °C), retried at the next opportunity",
+    "legio_paused": "anti-legionella cycle paused for Tempo red peak hours (water at {{temp}} °C)",
+    "boost_timer": "boost stopped after the maximum duration, back to the strategy (water at {{temp}} °C)",
+    "boost_red_peak": "boost refused on Tempo red peak hours (water at {{temp}} °C)",
+    "boost_reason_timer": "maximum duration",
+    "boost_reason_red_peak": "Tempo red peak hours"
+  }
+}
