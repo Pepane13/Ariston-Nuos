@@ -2,7 +2,8 @@
   "errors": {
     "login": "Connexion refusée : vérifiez l'e-mail et le mot de passe de votre compte Ariston NET.",
     "login_repair": "Connexion Ariston refusée : utilisez Réparer pour saisir à nouveau le mot de passe.",
-    "cloud": "Cloud Ariston injoignable :"
+    "cloud": "Cloud Ariston injoignable :",
+    "paused": "La stratégie automatique est désactivée : le cumulus est piloté par vos Flows. Réactivez d'abord la stratégie."
   },
   "modes": {
     "green": "Green",
@@ -19,7 +20,7 @@
     "red_peak": "Tempo rouge, heures pleines",
     "legionella": "Anti-légionellose",
     "manual": "Manuel",
-    "paused": "Stratégie suspendue"
+    "paused": "Stratégie désactivée (pilotage par les Flows)"
   },
   "legio": {
     "running": "Cycle en cours",

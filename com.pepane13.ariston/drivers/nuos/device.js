@@ -141,6 +141,13 @@ module.exports = class NuosDevice extends Homey.Device {
     await this.poll();
     if (!this.data || Object.keys(this.data).length === 0) return;
 
+    // Automatic strategy off: the device only executes Flow and app commands.
+    // No rule evaluation, no notification, no strategy trigger, no command of its own.
+    if (this.isPaused()) {
+      await this.pauseStrategy();
+      return;
+    }
+
     let home = {
       solarW: null, batteryPct: null, evCharging: false, tariff: {},
     };
@@ -167,23 +174,38 @@ module.exports = class NuosDevice extends Homey.Device {
     await this.saveState(result.state);
     for (const ev of result.events) await this.handleEvent(ev);
 
-    const auto = this.getCapabilityValue('ariston_automation') !== false;
     if (result.target.reason !== this.lastRule) {
       this.lastRule = result.target.reason;
       await this.setStoreValue('last_rule', this.lastRule);
-      if (auto) {
-        this.log(`Rule ${result.target.reason}: ${result.target.setpoint} °C ${result.target.mode}`);
-        this.driver.triggers.rule_changed.trigger(this, {
-          rule: this.homey.__(`rules.${result.target.reason}`), setpoint: result.target.setpoint,
-        }).catch(this.error);
-      }
+      this.log(`Rule ${result.target.reason}: ${result.target.setpoint} °C ${result.target.mode}`);
+      this.driver.triggers.rule_changed.trigger(this, {
+        rule: this.homey.__(`rules.${result.target.reason}`), setpoint: result.target.setpoint,
+      }).catch(this.error);
     }
-    await this.setCapabilityValue('ariston_rule', auto
-      ? `${this.homey.__(`rules.${result.target.reason}`)} · ${result.target.setpoint} °C`
-      : this.homey.__('rules.paused')).catch(this.error);
+    await this.setCapabilityValue('ariston_rule',
+      `${this.homey.__(`rules.${result.target.reason}`)} · ${result.target.setpoint} °C`).catch(this.error);
 
-    if (!auto || this.data.on === false) return;
+    if (this.data.on === false) return;
     await this.apply(result.target, result.boost);
+  }
+
+  /**
+   * Strategy paused: forget the timers and opportunities in progress (solar, boost timer,
+   * anti-legionella cycle, manual change) so nothing fires late and the strategy starts
+   * clean when it is switched on again. The date of the last anti-legionella cycle is kept.
+   */
+  async pauseStrategy() {
+    if (this.lastRule !== 'paused') {
+      this.lastRule = 'paused';
+      await this.setStoreValue('last_rule', 'paused').catch(this.error);
+      this.log('Automatic strategy paused: Flows are in control');
+    }
+    const legio = { ...emptyState().legio, doneMonth: this.state.legio?.doneMonth ?? null, lastDone: this.state.legio?.lastDone ?? null };
+    await this.saveState({ ...emptyState(), legio });
+    this.forceLegionella = false;
+    if (this.getCapabilityValue('ariston_rule') !== this.homey.__('rules.paused')) {
+      await this.setCapabilityValue('ariston_rule', this.homey.__('rules.paused')).catch(this.error);
+    }
   }
 
   async saveState(state) {
@@ -295,6 +317,7 @@ module.exports = class NuosDevice extends Homey.Device {
 
   /** A manual change is kept until the next daily reset (peak hours start or base time) */
   async setManual(patch) {
+    if (this.isPaused()) return; // the Flows are in control: nothing to remember
     const current = this.state.manual || {
       setpoint: this.data.comfortTemp ?? this.getCapabilityValue('target_temperature'),
       mode: MODE_NAMES[this.data.opMode] || 'green',
@@ -332,13 +355,23 @@ module.exports = class NuosDevice extends Homey.Device {
     await this.setCapabilityValue('ariston_boost', on).catch(this.error);
   }
 
+  isPaused() {
+    return this.getCapabilityValue('ariston_automation') === false;
+  }
+
   async setAutomation(on, fromCapability = false) {
     if (!fromCapability) await this.setCapabilityValue('ariston_automation', on);
     this.lastCommand = {};
-    if (on) this.homey.setTimeout(() => this.tick().catch(this.error), 1000);
+    if (on) {
+      this.log('Automatic strategy switched on');
+      this.homey.setTimeout(() => this.tick().catch(this.error), 1000);
+    } else {
+      await this.pauseStrategy();
+    }
   }
 
   async startLegionella() {
+    if (this.isPaused()) throw new Error(this.homey.__('errors.paused'));
     const legio = { ...this.state.legio, doneMonth: null };
     await this.saveState({ ...this.state, legio });
     this.forceLegionella = true;
@@ -346,13 +379,14 @@ module.exports = class NuosDevice extends Homey.Device {
   }
 
   async resumeStrategy() {
+    if (this.isPaused()) throw new Error(this.homey.__('errors.paused'));
     await this.saveState({ ...this.state, manual: null });
     this.lastCommand = {};
     await this.tick();
   }
 
   async onSettings({ changedKeys }) {
-    if (changedKeys.some((k) => k !== 'poll_interval')) {
+    if (!this.isPaused() && changedKeys.some((k) => k !== 'poll_interval')) {
       this.lastCommand = {};
       this.homey.setTimeout(() => this.tick().catch(this.error), 1000);
     }

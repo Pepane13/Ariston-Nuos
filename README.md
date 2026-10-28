@@ -34,6 +34,16 @@ Solar and battery rules are skipped while the car is charging. The daily reset (
 
 Commands are only sent when the heater differs from the target, and a command the heater did not take is repeated after 10 min at most: the Ariston cloud rate-limits requests (HTTP 429). A setpoint above the Green maximum of the heater switches to Comfort instead of being lowered.
 
+## Driving the water heater from Flows only
+
+Switch **Automatic strategy** off on the device (or use the *Switch the automatic strategy* card). The app then acts as a plain device driver:
+
+- it keeps reading the water temperature, mode, boost and heat pump state from the Ariston cloud;
+- it executes the Flow cards and app tiles (setpoint, mode, boost, on/off);
+- it evaluates no rule, sends no notification, fires no strategy trigger and sends no command of its own.
+
+The strategy-only cards (*Start an anti-legionella cycle now*, *Cancel the manual change*) return an error while the strategy is off. Switching it back on starts the strategy from a clean state.
+
 ## Device
 
 | Capability | |

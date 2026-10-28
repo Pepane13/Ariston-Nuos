@@ -2,7 +2,8 @@
   "errors": {
     "login": "Sign-in failed: check the e-mail and password of your Ariston NET account.",
     "login_repair": "Ariston sign-in failed: use Repair to enter the password again.",
-    "cloud": "Ariston cloud unreachable:"
+    "cloud": "Ariston cloud unreachable:",
+    "paused": "The automatic strategy is off: the water heater is driven by your Flows. Switch the strategy on first."
   },
   "modes": {
     "green": "Green",
@@ -19,7 +20,7 @@
     "red_peak": "Tempo red, peak hours",
     "legionella": "Anti-legionella",
     "manual": "Manual",
-    "paused": "Strategy paused"
+    "paused": "Strategy off (Flows in control)"
   },
   "legio": {
     "running": "Cycle in progress",

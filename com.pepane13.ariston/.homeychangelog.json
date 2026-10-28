@@ -1,1 +1,10 @@
-{"1.0.0":{"en":"First version: Nuos control through Ariston NET, solar, battery, Tempo and anti-legionella strategy.","fr":"Première version : pilotage du Nuos via Ariston NET, stratégie solaire, batterie, Tempo et anti-légionellose."}}
+{
+  "1.0.0": {
+    "en": "First version: Nuos control through Ariston NET, solar, battery, Tempo and anti-legionella strategy.",
+    "fr": "Première version : pilotage du Nuos via Ariston NET, stratégie solaire, batterie, Tempo et anti-légionellose."
+  },
+  "1.0.1": {
+    "en": "Automatic strategy off: the water heater only executes Flow and app commands (no notification, no trigger, no command of its own).",
+    "fr": "Stratégie automatique désactivée : le cumulus exécute uniquement les ordres des Flows et de l'app (aucune notification, aucun déclencheur, aucune commande de sa part)."
+  }
+}
