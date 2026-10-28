@@ -101,7 +101,16 @@ for %%f in (api.js lib\controller.js lib\home.js settings\index.html ..\test\con
   del /q "%%f"
   echo       Removed obsolete file %%f
 )
-if exist "settings" rd "settings" 2>nul
+rem An empty settings folder makes the Homey CLI require settings\index.html: remove it
+if exist "settings" (
+  rd /s /q "settings"
+  if exist "settings" (
+    echo [ERROR] Could not remove the folder "%CD%\settings" ^(OneDrive lock?^).
+    echo         Delete it in Explorer, then run install.cmd again.
+    goto :failpop
+  )
+  echo       Removed obsolete folder settings
+)
 if exist ".homeybuild" rd /s /q ".homeybuild"
 echo       npm install ^(app dependencies^) ...
 call npm install --omit=dev --no-audit --no-fund
