@@ -96,6 +96,13 @@ for /f "tokens=2 delims=:, " %%v in ('findstr /c:"\"version\"" "%APPDIR%\app.jso
 echo.
 echo [4/4] Installing Ariston Nuos %APPVER% on the Homey
 pushd "%APPDIR%"
+rem Files of version 1.0.x (automatic strategy) that 2.0.0 no longer uses
+for %%f in (api.js lib\controller.js lib\home.js settings\index.html ..\test\controller.test.js) do if exist "%%f" (
+  del /q "%%f"
+  echo       Removed obsolete file %%f
+)
+if exist "settings" rd "settings" 2>nul
+if exist ".homeybuild" rd /s /q ".homeybuild"
 echo       npm install ^(app dependencies^) ...
 call npm install --omit=dev --no-audit --no-fund
 if errorlevel 1 goto :failpop
@@ -113,8 +120,7 @@ if errorlevel 1 goto :failpop
 
 :done
 echo.
-echo       Installed. Next: Homey app, Settings, Apps, Ariston Nuos, Configure: choose the solar,
-echo       battery, EV charger and Linky devices. Then add the device: Devices, +, Ariston Nuos.
+echo       Installed. New device: Homey app, Devices, +, Ariston Nuos.
 
 :end
 popd

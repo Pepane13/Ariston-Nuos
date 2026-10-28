@@ -6,5 +6,9 @@
   "1.0.1": {
     "en": "Automatic strategy off: the water heater only executes Flow and app commands (no notification, no trigger, no command of its own).",
     "fr": "Stratégie automatique désactivée : le cumulus exécute uniquement les ordres des Flows et de l'app (aucune notification, aucun déclencheur, aucune commande de sa part)."
+  },
+  "2.0.0": {
+    "en": "Automatic strategy removed: the app is a plain driver for the water heater, driven by your Flows. Simpler settings, no notification of its own.",
+    "fr": "Stratégie automatique retirée : l'app est un simple pilote du cumulus, commandé par vos Flows. Réglages simplifiés, aucune notification de sa part."
   }
 }

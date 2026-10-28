@@ -8,26 +8,16 @@ module.exports = class NuosDriver extends Homey.Driver {
   async onInit() {
     const f = this.homey.flow;
     this.triggers = {
-      rule_changed: f.getDeviceTriggerCard('rule_changed'),
       mode_changed: f.getDeviceTriggerCard('mode_changed'),
-      legionella_started: f.getDeviceTriggerCard('legionella_started'),
-      legionella_done: f.getDeviceTriggerCard('legionella_done'),
-      boost_stopped: f.getDeviceTriggerCard('boost_stopped'),
       cloud_error: f.getDeviceTriggerCard('cloud_error'),
     };
 
     f.getConditionCard('mode_is').registerRunListener(({ device, mode }) => device.getCapabilityValue('ariston_mode') === mode);
     f.getConditionCard('boost_on').registerRunListener(({ device }) => device.getCapabilityValue('ariston_boost') === true);
     f.getConditionCard('heatpump_running').registerRunListener(({ device }) => device.getCapabilityValue('ariston_heatpump') === true);
-    f.getConditionCard('automation_on').registerRunListener(({ device }) => device.getCapabilityValue('ariston_automation') === true);
-    f.getConditionCard('rule_is').registerRunListener(({ device, rule }) => device.currentRule() === rule);
-    f.getConditionCard('legionella_done_month').registerRunListener(({ device }) => device.legionellaDoneThisMonth());
 
     f.getActionCard('set_mode').registerRunListener(({ device, mode }) => device.userSetMode(mode));
     f.getActionCard('set_boost').registerRunListener(({ device, state }) => device.userSetBoost(state === 'on'));
-    f.getActionCard('set_automation').registerRunListener(({ device, state }) => device.setAutomation(state === 'on'));
-    f.getActionCard('start_legionella').registerRunListener(({ device }) => device.startLegionella());
-    f.getActionCard('resume_strategy').registerRunListener(({ device }) => device.resumeStrategy());
     f.getActionCard('refresh').registerRunListener(({ device }) => device.poll(true));
 
     this.log('Nuos driver initialised');

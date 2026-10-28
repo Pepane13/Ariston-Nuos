@@ -1,6 +1,6 @@
 {
   "id": "com.pepane13.ariston",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "compatibility": ">=12.2.0",
   "sdk": 3,
   "platforms": [
@@ -11,15 +11,13 @@
     "fr": "Ariston Nuos"
   },
   "description": {
-    "en": "Control your Ariston Nuos heat pump water heater with solar, battery and EDF Tempo rules",
-    "fr": "Pilotez votre chauffe-eau thermodynamique Ariston Nuos selon le solaire, la batterie et EDF Tempo"
+    "en": "Control your Ariston Nuos heat pump water heater from Homey and your Flows",
+    "fr": "Pilotez votre chauffe-eau thermodynamique Ariston Nuos depuis Homey et vos Flows"
   },
   "category": [
     "climate"
   ],
-  "permissions": [
-    "homey:manager:api"
-  ],
+  "permissions": [],
   "images": {
     "small": "/assets/images/small.png",
     "large": "/assets/images/large.png",
@@ -32,16 +30,6 @@
   "brandColor": "#0F6FB5",
   "support": "https://github.com/Pepane13/Ariston-Nuos/issues",
   "source": "https://github.com/Pepane13/Ariston-Nuos",
-  "api": {
-    "getSources": {
-      "method": "GET",
-      "path": "/sources"
-    },
-    "setSources": {
-      "method": "PUT",
-      "path": "/sources"
-    }
-  },
   "capabilities": {
     "ariston_mode": {
       "type": "enum",
@@ -124,39 +112,6 @@
       },
       "icon": "/assets/capabilities/heatpump.svg"
     },
-    "ariston_automation": {
-      "type": "boolean",
-      "title": {
-        "en": "Automatic strategy",
-        "fr": "Stratégie automatique"
-      },
-      "getable": true,
-      "setable": true,
-      "uiComponent": "toggle",
-      "icon": "/assets/capabilities/auto.svg"
-    },
-    "ariston_rule": {
-      "type": "string",
-      "title": {
-        "en": "Active rule",
-        "fr": "Règle active"
-      },
-      "getable": true,
-      "setable": false,
-      "uiComponent": "sensor",
-      "icon": "/assets/capabilities/auto.svg"
-    },
-    "ariston_legionella": {
-      "type": "string",
-      "title": {
-        "en": "Last anti-legionella",
-        "fr": "Dernière anti-légionellose"
-      },
-      "getable": true,
-      "setable": false,
-      "uiComponent": "sensor",
-      "icon": "/assets/capabilities/legionella.svg"
-    },
     "ariston_energy": {
       "type": "number",
       "title": {
@@ -190,9 +145,6 @@
         "ariston_mode",
         "ariston_boost",
         "ariston_heatpump",
-        "ariston_automation",
-        "ariston_rule",
-        "ariston_legionella",
         "ariston_energy.hp",
         "ariston_energy.resistor"
       ],
@@ -295,788 +247,59 @@
       ],
       "settings": [
         {
-          "type": "group",
+          "id": "poll_interval",
+          "type": "number",
           "label": {
-            "en": "Base setpoint",
-            "fr": "Consigne de base"
+            "en": "Cloud polling interval",
+            "fr": "Intervalle de lecture du cloud"
           },
-          "children": [
-            {
-              "id": "base_setpoint",
-              "type": "number",
-              "label": {
-                "en": "Base setpoint",
-                "fr": "Consigne de base"
-              },
-              "value": 45,
-              "attr": {
-                "min": 40,
-                "max": 75,
-                "step": 1
-              },
-              "units": {
-                "en": "°C",
-                "fr": "°C"
-              }
-            },
-            {
-              "id": "base_mode",
-              "type": "dropdown",
-              "label": {
-                "en": "Base mode",
-                "fr": "Mode de base"
-              },
-              "value": "green",
-              "values": [
-                {
-                  "id": "green",
-                  "label": {
-                    "en": "Green",
-                    "fr": "Green"
-                  }
-                },
-                {
-                  "id": "comfort",
-                  "label": {
-                    "en": "Comfort",
-                    "fr": "Comfort"
-                  }
-                },
-                {
-                  "id": "fast",
-                  "label": {
-                    "en": "Fast",
-                    "fr": "Fast"
-                  }
-                },
-                {
-                  "id": "imemory",
-                  "label": {
-                    "en": "i-Memory",
-                    "fr": "i-Memory"
-                  }
-                }
-              ]
-            },
-            {
-              "id": "base_time",
-              "type": "text",
-              "label": {
-                "en": "Back to base at (HH:MM)",
-                "fr": "Retour à la base à (HH:MM)"
-              },
-              "value": "17:00",
-              "hint": {
-                "en": "Opportunities of the day (solar, battery, night) and manual changes end at this time and when peak hours start.",
-                "fr": "Les opportunités du jour (solaire, batterie, nuit) et les changements manuels prennent fin à cette heure et au passage en heures pleines."
-              }
-            }
-          ]
+          "value": 2,
+          "attr": {
+            "min": 1,
+            "max": 15,
+            "step": 1
+          },
+          "units": {
+            "en": "min",
+            "fr": "min"
+          },
+          "hint": {
+            "en": "The Ariston cloud limits the number of requests: keep 2 min or more.",
+            "fr": "Le cloud Ariston limite le nombre de requêtes : garder 2 min ou plus."
+          }
         },
         {
-          "type": "group",
+          "id": "gateway",
+          "type": "label",
           "label": {
-            "en": "Solar production",
-            "fr": "Production solaire"
+            "en": "Gateway",
+            "fr": "Passerelle"
           },
-          "children": [
-            {
-              "id": "solar_enabled",
-              "type": "checkbox",
-              "label": {
-                "en": "Heat with solar production",
-                "fr": "Chauffer avec la production solaire"
-              },
-              "value": true
-            },
-            {
-              "id": "solar_threshold",
-              "type": "number",
-              "label": {
-                "en": "Production above",
-                "fr": "Production supérieure à"
-              },
-              "value": 500,
-              "attr": {
-                "min": 50,
-                "max": 10000,
-                "step": 1
-              },
-              "units": {
-                "en": "W",
-                "fr": "W"
-              }
-            },
-            {
-              "id": "solar_duration",
-              "type": "number",
-              "label": {
-                "en": "For at least",
-                "fr": "Pendant au moins"
-              },
-              "value": 2,
-              "attr": {
-                "min": 1,
-                "max": 60,
-                "step": 1
-              },
-              "units": {
-                "en": "min",
-                "fr": "min"
-              }
-            },
-            {
-              "id": "solar_setpoint",
-              "type": "number",
-              "label": {
-                "en": "Solar setpoint",
-                "fr": "Consigne solaire"
-              },
-              "value": 52,
-              "attr": {
-                "min": 40,
-                "max": 75,
-                "step": 1
-              },
-              "units": {
-                "en": "°C",
-                "fr": "°C"
-              }
-            },
-            {
-              "id": "solar_mode",
-              "type": "dropdown",
-              "label": {
-                "en": "Solar mode",
-                "fr": "Mode solaire"
-              },
-              "value": "green",
-              "values": [
-                {
-                  "id": "green",
-                  "label": {
-                    "en": "Green",
-                    "fr": "Green"
-                  }
-                },
-                {
-                  "id": "comfort",
-                  "label": {
-                    "en": "Comfort",
-                    "fr": "Comfort"
-                  }
-                },
-                {
-                  "id": "fast",
-                  "label": {
-                    "en": "Fast",
-                    "fr": "Fast"
-                  }
-                },
-                {
-                  "id": "imemory",
-                  "label": {
-                    "en": "i-Memory",
-                    "fr": "i-Memory"
-                  }
-                }
-              ]
-            }
-          ]
+          "value": ""
         },
         {
-          "type": "group",
+          "id": "whe_type",
+          "type": "label",
           "label": {
-            "en": "Full home battery",
-            "fr": "Batterie domestique pleine"
+            "en": "Model",
+            "fr": "Modèle"
           },
-          "children": [
-            {
-              "id": "battery_enabled",
-              "type": "checkbox",
-              "label": {
-                "en": "Heat when the battery is full",
-                "fr": "Chauffer quand la batterie est pleine"
-              },
-              "value": true,
-              "hint": {
-                "en": "Only while the sun is up and the car is not charging.",
-                "fr": "Seulement en journée solaire et quand la voiture ne charge pas."
-              }
-            },
-            {
-              "id": "battery_threshold",
-              "type": "number",
-              "label": {
-                "en": "Battery above",
-                "fr": "Batterie au-dessus de"
-              },
-              "value": 95,
-              "attr": {
-                "min": 50,
-                "max": 100,
-                "step": 1
-              },
-              "units": {
-                "en": "%",
-                "fr": "%"
-              }
-            },
-            {
-              "id": "battery_setpoint",
-              "type": "number",
-              "label": {
-                "en": "Battery setpoint",
-                "fr": "Consigne batterie"
-              },
-              "value": 55,
-              "attr": {
-                "min": 40,
-                "max": 75,
-                "step": 1
-              },
-              "units": {
-                "en": "°C",
-                "fr": "°C"
-              }
-            },
-            {
-              "id": "battery_mode",
-              "type": "dropdown",
-              "label": {
-                "en": "Battery mode",
-                "fr": "Mode batterie"
-              },
-              "value": "comfort",
-              "values": [
-                {
-                  "id": "green",
-                  "label": {
-                    "en": "Green",
-                    "fr": "Green"
-                  }
-                },
-                {
-                  "id": "comfort",
-                  "label": {
-                    "en": "Comfort",
-                    "fr": "Comfort"
-                  }
-                },
-                {
-                  "id": "fast",
-                  "label": {
-                    "en": "Fast",
-                    "fr": "Fast"
-                  }
-                },
-                {
-                  "id": "imemory",
-                  "label": {
-                    "en": "i-Memory",
-                    "fr": "i-Memory"
-                  }
-                }
-              ]
-            }
-          ]
+          "value": ""
         },
         {
-          "type": "group",
+          "id": "limits",
+          "type": "label",
           "label": {
-            "en": "Night top-up (off-peak)",
-            "fr": "Appoint de nuit (heures creuses)"
+            "en": "Setpoint limits",
+            "fr": "Limites de consigne"
           },
-          "children": [
-            {
-              "id": "night_enabled",
-              "type": "checkbox",
-              "label": {
-                "en": "Top up at night",
-                "fr": "Faire l'appoint la nuit"
-              },
-              "value": true
-            },
-            {
-              "id": "night_time",
-              "type": "text",
-              "label": {
-                "en": "At (HH:MM)",
-                "fr": "À (HH:MM)"
-              },
-              "value": "23:00"
-            },
-            {
-              "id": "night_below",
-              "type": "number",
-              "label": {
-                "en": "If water below",
-                "fr": "Si eau sous"
-              },
-              "value": 50,
-              "attr": {
-                "min": 30,
-                "max": 70,
-                "step": 1
-              },
-              "units": {
-                "en": "°C",
-                "fr": "°C"
-              }
-            },
-            {
-              "id": "night_setpoint",
-              "type": "number",
-              "label": {
-                "en": "Night setpoint",
-                "fr": "Consigne de nuit"
-              },
-              "value": 52,
-              "attr": {
-                "min": 40,
-                "max": 75,
-                "step": 1
-              },
-              "units": {
-                "en": "°C",
-                "fr": "°C"
-              }
-            },
-            {
-              "id": "night_mode",
-              "type": "dropdown",
-              "label": {
-                "en": "Night mode",
-                "fr": "Mode de nuit"
-              },
-              "value": "green",
-              "values": [
-                {
-                  "id": "green",
-                  "label": {
-                    "en": "Green",
-                    "fr": "Green"
-                  }
-                },
-                {
-                  "id": "comfort",
-                  "label": {
-                    "en": "Comfort",
-                    "fr": "Comfort"
-                  }
-                },
-                {
-                  "id": "fast",
-                  "label": {
-                    "en": "Fast",
-                    "fr": "Fast"
-                  }
-                },
-                {
-                  "id": "imemory",
-                  "label": {
-                    "en": "i-Memory",
-                    "fr": "i-Memory"
-                  }
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "type": "group",
-          "label": {
-            "en": "EDF Tempo",
-            "fr": "EDF Tempo"
-          },
-          "children": [
-            {
-              "id": "tempo_enabled",
-              "type": "checkbox",
-              "label": {
-                "en": "Follow Tempo (Linky meter)",
-                "fr": "Suivre Tempo (compteur Linky)"
-              },
-              "value": true,
-              "hint": {
-                "en": "Needs the Linky meter chosen in the app settings.",
-                "fr": "Nécessite le compteur Linky choisi dans les réglages de l'app."
-              }
-            },
-            {
-              "id": "tempo_red_setpoint",
-              "type": "number",
-              "label": {
-                "en": "Red day, peak hours setpoint",
-                "fr": "Consigne jour rouge, heures pleines"
-              },
-              "value": 40,
-              "attr": {
-                "min": 40,
-                "max": 60,
-                "step": 1
-              },
-              "units": {
-                "en": "°C",
-                "fr": "°C"
-              },
-              "hint": {
-                "en": "Low setpoint so the heater does not draw from the grid at the red peak price.",
-                "fr": "Consigne basse pour ne pas tirer sur le réseau au tarif rouge heures pleines."
-              }
-            },
-            {
-              "id": "tempo_red_eve_setpoint",
-              "type": "number",
-              "label": {
-                "en": "Preheat the night before a red day",
-                "fr": "Préchauffe la nuit veille d'un jour rouge"
-              },
-              "value": 55,
-              "attr": {
-                "min": 40,
-                "max": 75,
-                "step": 1
-              },
-              "units": {
-                "en": "°C",
-                "fr": "°C"
-              }
-            },
-            {
-              "id": "tempo_red_allow_solar",
-              "type": "checkbox",
-              "label": {
-                "en": "Solar and battery allowed on red days",
-                "fr": "Solaire et batterie autorisés les jours rouges"
-              },
-              "value": true
-            },
-            {
-              "id": "tempo_red_block_boost",
-              "type": "checkbox",
-              "label": {
-                "en": "Refuse boost on red peak hours",
-                "fr": "Refuser le boost en heures pleines rouges"
-              },
-              "value": true
-            }
-          ]
-        },
-        {
-          "type": "group",
-          "label": {
-            "en": "Anti-legionella (monthly)",
-            "fr": "Anti-légionellose (mensuelle)"
-          },
-          "children": [
-            {
-              "id": "legio_enabled",
-              "type": "checkbox",
-              "label": {
-                "en": "Monthly anti-legionella cycle",
-                "fr": "Cycle anti-légionellose mensuel"
-              },
-              "value": true
-            },
-            {
-              "id": "legio_setpoint",
-              "type": "number",
-              "label": {
-                "en": "Cycle setpoint",
-                "fr": "Consigne du cycle"
-              },
-              "value": 65,
-              "attr": {
-                "min": 60,
-                "max": 75,
-                "step": 1
-              },
-              "units": {
-                "en": "°C",
-                "fr": "°C"
-              }
-            },
-            {
-              "id": "legio_done_temp",
-              "type": "number",
-              "label": {
-                "en": "Cycle done at",
-                "fr": "Cycle terminé à"
-              },
-              "value": 64,
-              "attr": {
-                "min": 55,
-                "max": 75,
-                "step": 1
-              },
-              "units": {
-                "en": "°C",
-                "fr": "°C"
-              }
-            },
-            {
-              "id": "legio_mode",
-              "type": "dropdown",
-              "label": {
-                "en": "Cycle mode",
-                "fr": "Mode du cycle"
-              },
-              "value": "comfort",
-              "values": [
-                {
-                  "id": "green",
-                  "label": {
-                    "en": "Green",
-                    "fr": "Green"
-                  }
-                },
-                {
-                  "id": "comfort",
-                  "label": {
-                    "en": "Comfort",
-                    "fr": "Comfort"
-                  }
-                },
-                {
-                  "id": "fast",
-                  "label": {
-                    "en": "Fast",
-                    "fr": "Fast"
-                  }
-                },
-                {
-                  "id": "imemory",
-                  "label": {
-                    "en": "i-Memory",
-                    "fr": "i-Memory"
-                  }
-                }
-              ]
-            },
-            {
-              "id": "legio_solar_threshold",
-              "type": "number",
-              "label": {
-                "en": "Solar production above",
-                "fr": "Production solaire supérieure à"
-              },
-              "value": 2000,
-              "attr": {
-                "min": 0,
-                "max": 10000,
-                "step": 1
-              },
-              "units": {
-                "en": "W",
-                "fr": "W"
-              }
-            },
-            {
-              "id": "legio_solar_duration",
-              "type": "number",
-              "label": {
-                "en": "For at least",
-                "fr": "Pendant au moins"
-              },
-              "value": 15,
-              "attr": {
-                "min": 1,
-                "max": 120,
-                "step": 1
-              },
-              "units": {
-                "en": "min",
-                "fr": "min"
-              }
-            },
-            {
-              "id": "legio_solar_days",
-              "type": "number",
-              "label": {
-                "en": "Solar window: until day",
-                "fr": "Fenêtre solaire : jusqu'au jour"
-              },
-              "value": 5,
-              "attr": {
-                "min": 0,
-                "max": 27,
-                "step": 1
-              },
-              "units": {
-                "en": "of month",
-                "fr": "du mois"
-              }
-            },
-            {
-              "id": "legio_fallback_day",
-              "type": "number",
-              "label": {
-                "en": "Otherwise from day",
-                "fr": "Sinon à partir du jour"
-              },
-              "value": 28,
-              "attr": {
-                "min": 1,
-                "max": 28,
-                "step": 1
-              },
-              "units": {
-                "en": "of month",
-                "fr": "du mois"
-              }
-            },
-            {
-              "id": "legio_fallback_time",
-              "type": "text",
-              "label": {
-                "en": "At (HH:MM, off-peak)",
-                "fr": "À (HH:MM, heures creuses)"
-              },
-              "value": "22:30"
-            }
-          ]
-        },
-        {
-          "type": "group",
-          "label": {
-            "en": "Boost",
-            "fr": "Boost"
-          },
-          "children": [
-            {
-              "id": "boost_max_minutes",
-              "type": "number",
-              "label": {
-                "en": "Stop boost after",
-                "fr": "Arrêter le boost après"
-              },
-              "value": 60,
-              "attr": {
-                "min": 0,
-                "max": 480,
-                "step": 1
-              },
-              "units": {
-                "en": "min",
-                "fr": "min"
-              },
-              "hint": {
-                "en": "Then back to the strategy. 0 = no limit.",
-                "fr": "Puis retour à la stratégie. 0 = sans limite."
-              }
-            }
-          ]
-        },
-        {
-          "type": "group",
-          "label": {
-            "en": "General",
-            "fr": "Général"
-          },
-          "children": [
-            {
-              "id": "notifications",
-              "type": "checkbox",
-              "label": {
-                "en": "Timeline notifications",
-                "fr": "Notifications dans la timeline"
-              },
-              "value": true
-            },
-            {
-              "id": "poll_interval",
-              "type": "number",
-              "label": {
-                "en": "Cloud polling interval",
-                "fr": "Intervalle de lecture du cloud"
-              },
-              "value": 2,
-              "attr": {
-                "min": 1,
-                "max": 15,
-                "step": 1
-              },
-              "units": {
-                "en": "min",
-                "fr": "min"
-              },
-              "hint": {
-                "en": "The Ariston cloud limits the number of requests: keep 2 min or more.",
-                "fr": "Le cloud Ariston limite le nombre de requêtes : garder 2 min ou plus."
-              }
-            },
-            {
-              "id": "gateway",
-              "type": "label",
-              "label": {
-                "en": "Gateway",
-                "fr": "Passerelle"
-              },
-              "value": ""
-            },
-            {
-              "id": "whe_type",
-              "type": "label",
-              "label": {
-                "en": "Model",
-                "fr": "Modèle"
-              },
-              "value": ""
-            },
-            {
-              "id": "limits",
-              "type": "label",
-              "label": {
-                "en": "Setpoint limits",
-                "fr": "Limites de consigne"
-              },
-              "value": ""
-            }
-          ]
+          "value": ""
         }
       ]
     }
   ],
   "flow": {
     "triggers": [
-      {
-        "id": "rule_changed",
-        "title": {
-          "en": "The active rule changed",
-          "fr": "La règle active a changé"
-        },
-        "tokens": [
-          {
-            "name": "rule",
-            "type": "string",
-            "title": {
-              "en": "Rule",
-              "fr": "Règle"
-            },
-            "example": {
-              "en": "Solar production",
-              "fr": "Production solaire"
-            }
-          },
-          {
-            "name": "setpoint",
-            "type": "number",
-            "title": {
-              "en": "Setpoint",
-              "fr": "Consigne"
-            },
-            "example": 52
-          }
-        ],
-        "args": [
-          {
-            "type": "device",
-            "name": "device",
-            "filter": "driver_id=nuos"
-          }
-        ]
-      },
       {
         "id": "mode_changed",
         "title": {
@@ -1092,93 +315,6 @@
               "fr": "Mode"
             },
             "example": "Green"
-          }
-        ],
-        "args": [
-          {
-            "type": "device",
-            "name": "device",
-            "filter": "driver_id=nuos"
-          }
-        ]
-      },
-      {
-        "id": "legionella_started",
-        "title": {
-          "en": "Anti-legionella cycle started",
-          "fr": "Le cycle anti-légionellose a démarré"
-        },
-        "tokens": [
-          {
-            "name": "temperature",
-            "type": "number",
-            "title": {
-              "en": "Water temperature",
-              "fr": "Température de l'eau"
-            },
-            "example": 48
-          }
-        ],
-        "args": [
-          {
-            "type": "device",
-            "name": "device",
-            "filter": "driver_id=nuos"
-          }
-        ]
-      },
-      {
-        "id": "legionella_done",
-        "title": {
-          "en": "Anti-legionella cycle done",
-          "fr": "Le cycle anti-légionellose est terminé"
-        },
-        "tokens": [
-          {
-            "name": "temperature",
-            "type": "number",
-            "title": {
-              "en": "Water temperature",
-              "fr": "Température de l'eau"
-            },
-            "example": 64
-          }
-        ],
-        "args": [
-          {
-            "type": "device",
-            "name": "device",
-            "filter": "driver_id=nuos"
-          }
-        ]
-      },
-      {
-        "id": "boost_stopped",
-        "title": {
-          "en": "Boost stopped by the app",
-          "fr": "Le boost a été arrêté par l'app"
-        },
-        "tokens": [
-          {
-            "name": "reason",
-            "type": "string",
-            "title": {
-              "en": "Reason",
-              "fr": "Raison"
-            },
-            "example": {
-              "en": "time limit",
-              "fr": "durée maximale"
-            }
-          },
-          {
-            "name": "temperature",
-            "type": "number",
-            "title": {
-              "en": "Water temperature",
-              "fr": "Température de l'eau"
-            },
-            "example": 55
           }
         ],
         "args": [
@@ -1299,118 +435,6 @@
             "filter": "driver_id=nuos"
           }
         ]
-      },
-      {
-        "id": "automation_on",
-        "title": {
-          "en": "Automatic strategy !{{is|is not}} on",
-          "fr": "La stratégie automatique !{{est|n'est pas}} active"
-        },
-        "args": [
-          {
-            "type": "device",
-            "name": "device",
-            "filter": "driver_id=nuos"
-          }
-        ]
-      },
-      {
-        "id": "rule_is",
-        "title": {
-          "en": "Active rule !{{is|is not}}",
-          "fr": "La règle active !{{est|n'est pas}}"
-        },
-        "titleFormatted": {
-          "en": "Active rule !{{is|is not}} [[rule]]",
-          "fr": "La règle active !{{est|n'est pas}} [[rule]]"
-        },
-        "args": [
-          {
-            "type": "device",
-            "name": "device",
-            "filter": "driver_id=nuos"
-          },
-          {
-            "type": "dropdown",
-            "name": "rule",
-            "title": {
-              "en": "Rule",
-              "fr": "Règle"
-            },
-            "values": [
-              {
-                "id": "base",
-                "label": {
-                  "en": "Base",
-                  "fr": "Base"
-                }
-              },
-              {
-                "id": "solar",
-                "label": {
-                  "en": "Solar production",
-                  "fr": "Production solaire"
-                }
-              },
-              {
-                "id": "battery",
-                "label": {
-                  "en": "Full battery",
-                  "fr": "Batterie pleine"
-                }
-              },
-              {
-                "id": "night",
-                "label": {
-                  "en": "Night top-up",
-                  "fr": "Appoint de nuit"
-                }
-              },
-              {
-                "id": "red_eve",
-                "label": {
-                  "en": "Preheat before red day",
-                  "fr": "Préchauffe veille de jour rouge"
-                }
-              },
-              {
-                "id": "red_peak",
-                "label": {
-                  "en": "Tempo red, peak hours",
-                  "fr": "Tempo rouge, heures pleines"
-                }
-              },
-              {
-                "id": "legionella",
-                "label": {
-                  "en": "Anti-legionella",
-                  "fr": "Anti-légionellose"
-                }
-              },
-              {
-                "id": "manual",
-                "label": {
-                  "en": "Manual",
-                  "fr": "Manuel"
-                }
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "id": "legionella_done_month",
-        "title": {
-          "en": "Anti-legionella !{{is|is not}} done this month",
-          "fr": "L'anti-légionellose !{{est|n'est pas}} faite ce mois-ci"
-        },
-        "args": [
-          {
-            "type": "device",
-            "name": "device",
-            "filter": "driver_id=nuos"
-          }
-        ]
       }
     ],
     "actions": [
@@ -1423,10 +447,6 @@
         "titleFormatted": {
           "en": "Set the mode to [[mode]]",
           "fr": "Régler le mode sur [[mode]]"
-        },
-        "hint": {
-          "en": "Kept until the next daily reset, like a change from the app.",
-          "fr": "Conservé jusqu'à la prochaine remise à zéro quotidienne, comme un changement depuis l'app."
         },
         "args": [
           {
@@ -1513,76 +533,6 @@
                 }
               }
             ]
-          }
-        ]
-      },
-      {
-        "id": "set_automation",
-        "title": {
-          "en": "Switch the automatic strategy",
-          "fr": "Activer ou suspendre la stratégie automatique"
-        },
-        "titleFormatted": {
-          "en": "Automatic strategy [[state]]",
-          "fr": "Stratégie automatique : [[state]]"
-        },
-        "args": [
-          {
-            "type": "device",
-            "name": "device",
-            "filter": "driver_id=nuos"
-          },
-          {
-            "type": "dropdown",
-            "name": "state",
-            "title": {
-              "en": "State",
-              "fr": "État"
-            },
-            "values": [
-              {
-                "id": "on",
-                "label": {
-                  "en": "On",
-                  "fr": "Activé"
-                }
-              },
-              {
-                "id": "off",
-                "label": {
-                  "en": "Off",
-                  "fr": "Désactivé"
-                }
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "id": "start_legionella",
-        "title": {
-          "en": "Start an anti-legionella cycle now",
-          "fr": "Lancer un cycle anti-légionellose maintenant"
-        },
-        "args": [
-          {
-            "type": "device",
-            "name": "device",
-            "filter": "driver_id=nuos"
-          }
-        ]
-      },
-      {
-        "id": "resume_strategy",
-        "title": {
-          "en": "Cancel the manual change and resume the strategy",
-          "fr": "Annuler le changement manuel et reprendre la stratégie"
-        },
-        "args": [
-          {
-            "type": "device",
-            "name": "device",
-            "filter": "driver_id=nuos"
           }
         ]
       },
