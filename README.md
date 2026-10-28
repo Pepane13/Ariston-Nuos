@@ -1,6 +1,6 @@
 # Ariston Nuos for Homey
 
-Unofficial Homey Pro app that controls an **Ariston Nuos** heat pump water heater through the Ariston NET cloud, and runs the hot water strategy inside the app instead of in Flows: solar production, full home battery, off-peak night top-up, **EDF Tempo** and a monthly anti-legionella cycle.
+Unofficial Homey Pro app ([Pepane13/Ariston-Nuos](https://github.com/Pepane13/Ariston-Nuos)) that controls an **Ariston Nuos** heat pump water heater through the Ariston NET cloud, and runs the hot water strategy inside the app instead of in Flows: solar production, full home battery, off-peak night top-up, **EDF Tempo** and a monthly anti-legionella cycle.
 
 It replaces the community app `com.ariston`, which is no longer maintained and has left the Homey App Store.
 

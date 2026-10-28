@@ -220,8 +220,8 @@ APP = {
     'images': {'small': '/assets/images/small.png', 'large': '/assets/images/large.png', 'xlarge': '/assets/images/xlarge.png'},
     'author': {'name': 'Stéphane Renaudet', 'email': 'stephane.renaudet@gmail.com'},
     'brandColor': '#0F6FB5',
-    'support': 'https://github.com/Pepane13/homey-ariston-nuos/issues',
-    'source': 'https://github.com/Pepane13/homey-ariston-nuos',
+    'support': 'https://github.com/Pepane13/Ariston-Nuos/issues',
+    'source': 'https://github.com/Pepane13/Ariston-Nuos',
     'api': {
         'getSources': {'method': 'GET', 'path': '/sources'},
         'setSources': {'method': 'PUT', 'path': '/sources'},

@@ -30,8 +30,8 @@
     "email": "stephane.renaudet@gmail.com"
   },
   "brandColor": "#0F6FB5",
-  "support": "https://github.com/Pepane13/homey-ariston-nuos/issues",
-  "source": "https://github.com/Pepane13/homey-ariston-nuos",
+  "support": "https://github.com/Pepane13/Ariston-Nuos/issues",
+  "source": "https://github.com/Pepane13/Ariston-Nuos",
   "api": {
     "getSources": {
       "method": "GET",
