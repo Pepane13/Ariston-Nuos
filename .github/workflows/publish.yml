@@ -89,7 +89,22 @@ jobs:
         env:
           HOMEY_HEADLESS: '1'
           HOMEY_PAT: ${{ secrets.HOMEY_PAT }}
-        run: homey app publish
+        run: |
+          set +e
+          homey app publish 2>&1 | tee publish.log
+          status=${PIPESTATUS[0]}
+          if [ "$status" -ne 0 ]; then
+            {
+              echo "### Publication to Homey failed"
+              echo '```'
+              sed -e 's/\x1b\[[0-9;]*m//g' publish.log | tail -n 30
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+            msg=$(sed -e 's/\x1b\[[0-9;]*m//g' publish.log | grep -v '^\s*$' | tail -n 3 | tr '\n' ' ')
+            echo "::error title=homey app publish::$msg"
+          fi
+          rm -f publish.log
+          exit $status
 
       - name: Push the version and its tag
         env:
