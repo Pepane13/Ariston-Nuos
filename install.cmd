@@ -2,26 +2,29 @@
 rem ------------------------------------------------------------------------------------------
 rem  Ariston Nuos - installs the app on your Homey Pro from a Windows PC.
 rem
-rem  Double-click this file (or run "install.cmd" from a command prompt), either at the root
-rem  of the repository or inside the com.pepane13.ariston app folder. It runs in cmd, not
+rem  Double-click this file (or run "install.cmd" from a command prompt). It runs in cmd, not
 rem  PowerShell, so the PowerShell script execution policy ("running scripts is disabled on
 rem  this system") cannot block the Homey CLI.
 rem
-rem  Steps: Node.js check (24+), Homey CLI install or update, git pull (if this is a git clone),
-rem  then "homey app install" (with sign-in and Homey selection if needed).
+rem  By default the app is installed straight from GitHub: the latest version of the main branch
+rem  of https://github.com/Pepane13/Ariston-Nuos is downloaded (curl and tar, built into
+rem  Windows 10 and 11, no git needed), unpacked in a temporary folder and installed on the
+rem  Homey. install.cmd can therefore be run from any folder.
+rem
+rem  Options:  install.cmd          install the latest version from GitHub
+rem            install.cmd local    install the local files next to install.cmd instead
+rem
+rem  Steps: Node.js check (24+), Homey CLI install or update, source download, then
+rem  "homey app install" (with sign-in and Homey selection if needed).
 rem  The app is meant for a local install only: it is not published to the Homey App Store.
 rem ------------------------------------------------------------------------------------------
 setlocal EnableExtensions
 cd /d "%~dp0"
 title Ariston Nuos - install
-rem install.cmd can sit at the root of the repository or inside the app folder itself
-set "APPDIR=%~dp0com.pepane13.ariston"
-if exist "%~dp0app.json" set "APPDIR=%~dp0."
-if not exist "%APPDIR%\app.json" (
-  echo [ERROR] App not found: put install.cmd at the root of the repository
-  echo         or in the com.pepane13.ariston folder ^(next to app.json^).
-  goto :fail
-)
+set "MODE=%~1"
+set "REPO=Pepane13/Ariston-Nuos"
+set "BRANCH=main"
+set "SRCDIR=%TEMP%\ariston-nuos-install"
 
 rem ---------- 1. Node.js ----------
 echo.
@@ -70,21 +73,42 @@ if not exist "%HOMEY%" (
 )
 for /f "delims=" %%v in ('call "%HOMEY%" --version 2^>nul') do echo       Homey CLI %%v
 
-rem ---------- 3. Latest version of the source ----------
+rem ---------- 3. Source code ----------
 echo.
 echo [3/4] Source code
-where git >nul 2>&1
+if /i "%MODE%"=="local" goto :localsrc
+echo       Downloading the latest version from https://github.com/%REPO% ^(%BRANCH%^) ...
+if exist "%SRCDIR%" rd /s /q "%SRCDIR%"
+mkdir "%SRCDIR%" 2>nul
+curl -fsSL --retry 2 -o "%SRCDIR%\source.zip" "https://github.com/%REPO%/archive/refs/heads/%BRANCH%.zip"
 if errorlevel 1 (
-  echo       git not installed: skipped, the local files are installed as they are.
-  goto :install
+  echo [WARNING] Download failed ^(no Internet access, or GitHub unreachable^).
+  goto :localsrc
 )
-git -C "%APPDIR%" rev-parse --is-inside-work-tree >nul 2>&1
+tar -xf "%SRCDIR%\source.zip" -C "%SRCDIR%"
 if errorlevel 1 (
-  echo       Not a git clone: skipped, the local files are installed as they are.
-  goto :install
+  echo [WARNING] Could not unpack the download.
+  goto :localsrc
 )
-git -C "%APPDIR%" pull --ff-only
-if errorlevel 1 echo [WARNING] git pull failed ^(local changes?^): the local files are installed as they are.
+set "APPDIR="
+for /d %%d in ("%SRCDIR%\*") do if exist "%%d\com.pepane13.ariston\app.json" set "APPDIR=%%d\com.pepane13.ariston"
+if not defined APPDIR (
+  echo [WARNING] The download does not contain the app.
+  goto :localsrc
+)
+echo       Downloaded to %APPDIR%
+goto :install
+
+:localsrc
+rem install.cmd can sit at the root of the repository or inside the app folder itself
+set "APPDIR=%~dp0com.pepane13.ariston"
+if exist "%~dp0app.json" set "APPDIR=%~dp0."
+if not exist "%APPDIR%\app.json" (
+  echo [ERROR] No app to install: the download failed and there is no local copy
+  echo         ^(com.pepane13.ariston folder next to install.cmd^).
+  goto :fail
+)
+echo       Local files are installed: %APPDIR%
 
 rem ---------- 4. Install on the Homey ----------
 :install
@@ -119,7 +143,10 @@ call "%HOMEY%" app install
 if not errorlevel 1 goto :done
 
 echo.
-echo       Install failed: signing in to your Athom account and choosing the Homey, then retrying.
+echo       Install failed. If the error above is about sign-in or the choice of Homey, sign in again;
+echo       otherwise ^(validation error^) answer N and send the error message.
+choice /C YN /N /M "      Sign in to your Athom account and retry? [Y/N] "
+if errorlevel 2 goto :failpop
 call "%HOMEY%" login
 if errorlevel 1 goto :failpop
 call "%HOMEY%" select

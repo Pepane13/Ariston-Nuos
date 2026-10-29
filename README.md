@@ -8,7 +8,8 @@ The app is a plain device driver: it shows the state of the water heater and exe
 
 ## Install (Windows)
 
-1. Double-click `install.cmd` at the root of the repository. It checks Node.js (24+), installs or updates the Homey CLI, removes files of earlier versions that are no longer used, and runs `homey app install` (sign-in and Homey selection the first time).
+1. Download `install.cmd` (or keep the copy you have) and double-click it. It checks Node.js (24+), installs or updates the Homey CLI, downloads the latest version of this repository from GitHub (no git needed: `curl` and `tar` ship with Windows 10 and 11), and runs `homey app install` (sign-in and Homey selection the first time). Run it again at any time to install the latest version.
+   - `install.cmd local` installs the local files next to the script instead (for development).
 2. Homey app → **Devices → + → Ariston Nuos**, sign in with the Ariston NET account (same e-mail and password as the Ariston app).
 
 ## Device
