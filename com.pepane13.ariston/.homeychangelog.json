@@ -14,5 +14,9 @@
   "2.0.1": {
     "en": "Fix: devices paired with 1.0.x showed no values and crashed the mobile app; the obsolete strategy capabilities are now removed properly.",
     "fr": "Correctif : les appareils ajoutés en 1.0.x n'affichaient plus aucune valeur et faisaient planter l'app mobile ; les anciennes capacités de la stratégie sont maintenant bien retirées."
+  },
+  "2.0.2": {
+    "en": "Première publication depuis GitHub, sans changement fonctionnel.",
+    "fr": "Première publication depuis GitHub, sans changement fonctionnel."
   }
 }

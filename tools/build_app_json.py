@@ -4,7 +4,7 @@ import json
 import os
 
 ROOT = os.path.join(os.path.dirname(__file__), '..', 'com.pepane13.ariston')
-VERSION = '2.0.1'
+VERSION = '2.0.2'
 
 
 def t(en, fr):
