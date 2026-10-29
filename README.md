@@ -6,11 +6,28 @@ The app is a plain device driver: it shows the state of the water heater and exe
 
 > Not affiliated with Ariston. The Ariston NET API is not publicly documented: it can change without notice. Endpoints follow the reverse-engineered [python-ariston-api](https://github.com/fustom/python-ariston-api) project. The app is meant for a **local install** (`homey app install`), not for the App Store.
 
-## Install (Windows)
+## Install from GitHub, without a PC
 
-1. Download `install.cmd` (or keep the copy you have) and double-click it. It checks Node.js (24+), installs or updates the Homey CLI, downloads the latest version of this repository from GitHub (no git needed: `curl` and `tar` ship with Windows 10 and 11), and runs `homey app install` (sign-in and Homey selection the first time). Run it again at any time to install the latest version.
-   - `install.cmd local` installs the local files next to the script instead (for development).
-2. Homey app → **Devices → + → Ariston Nuos**, sign in with the Ariston NET account (same e-mail and password as the Ariston app).
+The workflow **Publish to Homey** builds and uploads the app to Homey Developer Tools straight from this repository.
+
+One-time setup:
+1. Create a personal access token at https://tools.developer.homey.app/me.
+2. In this repository: **Settings → Secrets and variables → Actions → New repository secret**, name `HOMEY_PAT`, value the token.
+
+Each new version (from a browser or the GitHub mobile app):
+1. **Actions → Publish to Homey → Run workflow**, choose patch / minor / major and write what's new.
+2. The workflow increases the version, runs the tests, validates the app, uploads it to Homey Developer Tools, then commits the version and tags it (`vX.Y.Z`).
+3. In Homey Developer Tools (link in the run summary): build → **Release to Test**, then open the test link on the phone and install or update the app on the Homey.
+
+The workflow **Validate** runs the tests and the Homey validation on every push.
+
+## Install from a Windows PC
+
+`install.cmd` downloads the latest version from GitHub (no git needed) and runs `homey app install`. `install.cmd local` installs the local files next to the script instead.
+
+## First use
+
+Homey app → **Devices → + → Ariston Nuos**, sign in with the Ariston NET account (same e-mail and password as the Ariston app).
 
 ## Device
 

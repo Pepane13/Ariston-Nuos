@@ -1,0 +1,111 @@
+name: Publish to Homey
+
+# Run from GitHub (Actions tab > "Publish to Homey" > Run workflow), from a computer or the
+# GitHub mobile app. The new version is uploaded to Homey Developer Tools as a new build;
+# release it there as a Test version and install it on the Homey from the test link.
+#
+# One-time setup: create a personal access token at https://tools.developer.homey.app/me and
+# store it in this repository: Settings > Secrets and variables > Actions > New repository
+# secret, name HOMEY_PAT.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        type: choice
+        description: Version number to increase
+        required: true
+        default: patch
+        options:
+          - patch
+          - minor
+          - major
+      changelog:
+        type: string
+        description: What's new (shown in Homey)
+        required: true
+
+permissions:
+  contents: write # commit the new version and push its tag
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Publish to Homey
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Check the Homey token
+        env:
+          HOMEY_PAT: ${{ secrets.HOMEY_PAT }}
+        run: |
+          if [ -z "$HOMEY_PAT" ]; then
+            echo "::error::Secret HOMEY_PAT is missing: create a token at https://tools.developer.homey.app/me and add it under Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+
+      - name: Increase the version
+        id: version
+        env:
+          KIND: ${{ inputs.version }}
+          CHANGELOG: ${{ inputs.changelog }}
+        run: |
+          VERSION=$(python3 tools/bump_version.py "$KIND" "$CHANGELOG")
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "New version: $VERSION"
+
+      - name: Tests
+        run: node --test test/*.test.js
+
+      - name: Install the Homey CLI and the app dependencies
+        working-directory: com.pepane13.ariston
+        run: |
+          npm install --global homey@latest --no-audit --no-fund
+          npm ci --omit=dev --no-audit --no-fund
+
+      - name: Validate
+        working-directory: com.pepane13.ariston
+        run: homey app validate --level publish
+
+      - name: Commit the new version
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Version $VERSION"
+
+      - name: Publish to Homey Developer Tools
+        working-directory: com.pepane13.ariston
+        env:
+          HOMEY_HEADLESS: '1'
+          HOMEY_PAT: ${{ secrets.HOMEY_PAT }}
+        run: homey app publish
+
+      - name: Push the version and its tag
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          git tag -a "v$VERSION" -m "Ariston Nuos $VERSION"
+          git push origin HEAD --tags
+
+      - name: Summary
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          {
+            echo "### Ariston Nuos $VERSION published"
+            echo ""
+            echo "1. Open https://tools.developer.homey.app/apps/app/com.pepane13.ariston"
+            echo "2. Build $VERSION > **Release to Test**"
+            echo "3. Open the test link on the phone and tap **Install** (or update) for your Homey."
+          } >> "$GITHUB_STEP_SUMMARY"
